@@ -1,0 +1,44 @@
+name: cve_auto_report_action
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+
+      - name: Setup Python
+        uses: actions/setup-python@v2.2.2
+
+      - name: Setup Dependencies
+        run: python3 -m pip install -r requirements.txt
+
+      - name: Run CVEs Monitor
+        run: python3 main.py
+        shell: bash
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
+
+      - name: Create local changes
+        run: git add cve_files/*
+
+      - name: Commit results to Github
+        run: |
+            git config --local user.email "mokhtari_alireza77@yahoo.com"
+            git config --global user.name "mx-solo"
+            git commit -m "Bot auto update" -a --allow-empty
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+           github_token: ${{ secrets.GITHUB_TOKEN }}
+           branch: ${{ github.ref }}
