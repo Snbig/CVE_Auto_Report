@@ -278,11 +278,9 @@ if response.status_code == 200:
     new_last_checked_time = datetime.now() 
     write_last_checked_time(new_last_checked_time) 
     
-    
+    news_cve = {}
     for cve in cve_list:
-        news_cve = {}
         published_time = parse_cve_time(cve['published'])
-        
         if published_time > last_checked_time:
             description = cve['descriptions'][0]['value'].lower()
             if any(keyword in description for keyword in keywords):
@@ -298,9 +296,9 @@ if response.status_code == 200:
                 
                 news_cve[cve['id']] = cve_data
 
-    
     if news_cve:
-        for cve,cve_data in news_cve:
+        print(news_cve)
+        for cve,cve_data in news_cve.items():
             res = create_cve_details(cve_data)
             news_cve[cve] = {**cve, **res}
             
