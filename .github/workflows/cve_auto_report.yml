@@ -36,7 +36,7 @@ jobs:
           KHOJ_TOKEN: ${{ secrets.KHOJ_TOKEN }}
 
       - name: Create local changes
-        run: git add cve_files/* log/*
+        run: git add "cve_files/" "log/"
 
       - name: Commit results to Github
         run: |
