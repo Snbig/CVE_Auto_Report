@@ -207,7 +207,7 @@ def RAG(message=''):
                 "Accept-Language": "en-US,en;q=0.9,fa;q=0.8",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
                 "Cache-Control": "no-cache",
-                'Authorization': 'Bearer kk-kv9gUa9Z_JBXsvI4DIFBjWxmQAf-nkwmd7Zdzixj4J8',
+                'Authorization': 'Bearer kk-_GKPb-ZGktf3iSggO4U1oKH3UND5_Pajelhcp4yRM0E',
                 "sec-gpc": "1",
             }
 
