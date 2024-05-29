@@ -12,13 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       - name: Setup Python
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12.2' 
+          python-version: '3.12.2'
+
+      - name: Verify Python version
         run: python3 --version
 
       - name: Setup Dependencies
@@ -37,9 +38,9 @@ jobs:
 
       - name: Commit results to Github
         run: |
-            git config --local user.email ""
-            git config --global user.name "AI"
-            git commit -m "Bot auto update" -a --allow-empty
+          git config --local user.email ""
+          git config --local user.name "AI"
+          git commit -m "Bot auto update" -a --allow-empty
 
       - name: Push changes
         uses: ad-m/github-push-action@master
