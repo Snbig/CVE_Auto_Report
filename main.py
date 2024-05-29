@@ -276,7 +276,6 @@ if response.status_code == 200:
 
     last_checked_time = read_last_checked_time()
     new_last_checked_time = datetime.now() 
-    write_last_checked_time(new_last_checked_time) 
     
     news_cve = {}
     for cve in cve_list:
@@ -300,10 +299,14 @@ if response.status_code == 200:
         print(news_cve)
         for cve,cve_data in news_cve.items():
             res = create_cve_details(cve_data)
-            news_cve[cve] = {**cve, **res}
+            news_cve[cve] = {**cve_data, **res}
+
             
     all_cve = {**news_cve, **matched_cves}
     convert_json(all_cve)
+    
+
+    write_last_checked_time(new_last_checked_time) 
 
 else:
     print("error api:", response.status_code)
