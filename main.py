@@ -3,40 +3,44 @@ import os
 from datetime import datetime
 from markdown import markdown
 import time
-from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 import json
 import argparse
+from html.parser import HTMLParser
 
-# parser = argparse.ArgumentParser(description='دریافت cvename از خط فرمان')
-# parser.add_argument('--cvename', type=str, default='', help='نام CVE (اگر وجود دارد)')
 
-# args = parser.parse_args()
+parser = argparse.ArgumentParser(description='دریافت cvename از خط فرمان')
+parser.add_argument('--cvename', type=str, default='', help='نام CVE (اگر وجود دارد)')
 
-# cvename = args.cvename
+args = parser.parse_args()
 
-cvename = "CVE-2019-9512"
+cvename = args.cvename
 
 matched_cves = {}
 
 all_cve = {}
 
 
+khoj_token = os.getenv('KHOJ_TOKEN')
+vulncheck = os.getenv('VULNCHECK_TOKEN')
+
 def send_cve_message_to_telegram(cve_data):
     try:
         # Generate message from JSON data
-        message = f"<b>Title:</b> {cve_data['title']}<br>"
-        message += f"<b>Source:</b> {cve_data['source']}<br>"
-        message += f"<b>Link:</b> <a href='{cve_data['link']}'>View Details</a><br>"
-        message += f"<b>Summary:</b> {cve_data['summary']}<br>"
-        message += f"<b>Publish Date:</b> {cve_data['publish_date']}<br><br>"
-        message += f"<b>Info:</b> {cve_data['info']}<br>"
-        message += f"<b>Tags:</b> {', '.join(cve_data['tags'])}<br>"
+        message = f"🟢 [{cve_data['id']}]({cve_data['link']})  \n\n"
+        message = f"🚨 *عنوان*: {cve_data['title']}  \n\n"
+        message += f"📣 *منابع*: {cve_data['source']} \n\n "
+        message += f"📓 *خلاصه*: {cve_data['summary']} \n\n  "
+        message += f"📅 *تاریخ انتشار*: {cve_data['publish_date']}  \n\n  "
+        message += f"😈 *شرح آسیب پذیری*: {cve_data['info']} \n\n "
+        message += f"🏷️ *برچسب*: {', '.join(cve_data['tags'])} \n\n "
+        message += f"🏷️ *چارت*: {', '.join(cve_data['chart'])} \n\n "
 
         telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
         telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
         telegram_thread_id = os.getenv('TELEGRAM_THREAD_ID')
+
 
         if not telegram_bot_token:
             raise ValueError("TELEGRAM_BOT_TOKEN wasn't configured in the secrets!")
@@ -48,9 +52,8 @@ def send_cve_message_to_telegram(cve_data):
             raise ValueError("TELEGRAM_THREAD_ID wasn't configured in the secrets!")
         
         # Send message to Telegram
-        url = f'https://api.telegram.org/bot{telegram_bot_token}/sendMessage?chat_id={telegram_chat_id}&message_thread_id={telegram_thread_id}&text={message}&message=HTML'
+        url = f'https://api.telegram.org/bot{telegram_bot_token}/sendMessage?chat_id={telegram_chat_id}&message_thread_id={telegram_thread_id}&text={message}&parse_mode=Markdown'
 
-        
         response = requests.get(url)
         
         if response.status_code != 200:
@@ -63,7 +66,7 @@ def send_cve_message_to_telegram(cve_data):
             raise Exception(f"Telegram API error: {resp['description']}")
     
     except Exception as e:
-        with open("./logs/logs.txt", "a") as log_file:
+        with open("./log/logs.txt", "a") as log_file:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             log_file.write(f"{current_time} - Error on sending message to telegram for CVE {cve_data['title']}: {e}\n")
         raise
@@ -82,28 +85,31 @@ def convert_json(all_cve):
     for cve_id, cve_data in all_cve.items():
         file_name = f"cve_files/{cve_id}.json"
 
-        soup = BeautifulSoup(cve_data['info'], features="lxml")
-        text = ''.join(soup.find_all(string=True))
+        text = cve_data['info']
+
 
         data = {
+        'id': cve_data["CVE"],
         'tags': cve_data["tags"],
         'source': "زفتا",
         'title': cve_data["title"],
         'link': "https://nvd.nist.gov/vuln/detail/" + cve_data["CVE"],
-        'summary': f"{text[:200]} ...",
-        'info': f"{cve_data['info']}<br> <h2>راهکار امن سازی :</h2><br> {cve_data['remedition']}" ,
+        'summary': f"{text[:200]} ... ",
+        'info': f"{cve_data['info']}\n\n   راهکار امن سازی :   {cve_data['remedition']}" ,
         'publish_date': convert_datetime_format(cve_data['publishedDate']),
         'chart': cve_data['chart'],
         }
 
-        print(f"sending {cve_data["CVE"]} to telegram ...")
-        send_cve_message_to_telegram(data)
+        print(f"file {cve_data["CVE"]} created")
 
         # Dump the data to JSON with proper indentation and encoding
         json_data = json.dumps(data, ensure_ascii=False, indent=4)
         with open(file_name, 'w', encoding='utf-8') as file:
             file.write(json_data)
-        print(f"file {cve_data["CVE"]} created")
+
+        print(f"sending {cve_data["CVE"]} to telegram ...")
+
+        send_cve_message_to_telegram(data)
 
 
 
@@ -127,28 +133,28 @@ def create_cve_details(cve):
             references_string = ', '.join(cve['References'])
             for key, prompt in prompts.items():
                 final_prompt = prompt.replace("{{ID}}", cve['CVE']).replace("{{REF}}", references_string)
-                print(f"Send prompt to khoj ...")
+                print(f"Sending prompt to khoj ...")
                 res = RAG(final_prompt)
                 if "Too Many Requests" in res:
                     raise Exception("Too Many Requests: Please slow down.")
                 if key == 'title':  
-                    res = remove_compiled_section(markup_to_text(res))
+                    res = remove_compiled_section(res)
                     match = re.search(r'\[([^\]]+)\]', res).group(1)
                     ai_dic[key] = match
                     print(f"create title for {cve['CVE']}")
                 elif key == 'tags':
-                    res = remove_compiled_section(markup_to_text(res))
+                    res = remove_compiled_section(res)
                     tags = re.findall(r'\[([^\]]+)\]', res)
                     ai_dic[key] = tags
                     print(f"create tags for {cve['CVE']}")
                 elif key == 'chart':
-                    res = remove_compiled_section(markup_to_text(res))
+                    res = remove_compiled_section(res)
                     numbers = re.findall(r'\[(.*?)\]', res)
-                    chart = [int(num) for group in numbers for num in group.split(', ')]
+                    chart = [int(num.replace("\\","")) for group in numbers for num in group.split(', ')]
                     ai_dic[key] = chart
                     print(f"create chart for {cve['CVE']}")
                 else: 
-                    res = remove_compiled_section(markdown(res))
+                    res = remove_compiled_section(res)
                     ai_dic[key] = res.replace("\n","")
                     print(f"create {key} for {cve['CVE']}")
             break  
@@ -164,11 +170,11 @@ def create_cve_details(cve):
     return ai_dic
 
 prompts = {
-    "info" : "یک توضیح کامل در مورد آسیب پذیری با شناسه {{ID}} با منابع {{REF}} به زبان فارسی بهم بده و هیچ توضیحی در خصوص راهکار امن سازی نده و در متنی که بهم میدی هم سوال از من نپرس ",
-    "remedition" : "یک راهکار امن سازی برای آسیب پذیری با شناسه {{ID}} بهم بده با توجه به منابع {{REF}} و اگر در ورژن های بعدی آسیب پذیری رفع شده بود ورژن امن را در آخر بهم بگو و در متن هم از من سوال نپرس",
+    "tags" : "چند تا برچسب به انگلیسی برای آسیب پذیری {{ID}} بهم بده در برچسب از نوشتن امتیاز خودداری بکن و فقط برچسب های کلی را بنویس هر هر بچسب را داخل [] بنویس ",
     "chart" : "با توجه به به آسیب پذیری با شناسه {{ID}} اگر در مورد دیتابیس بود عدد 17 را بهم نمایش بده اگر در مورد سیستم عامل بود عدد 16 و 17 و 2 و اگر در مورد تجهیزات بود مثل سیسکو ، فورتیگیت ، استوریج و .. عدد 16 و 4 و اگر در مورد سایت وب اپلیکیشن و وب سرور بود 17 و 18 را برایم در خروجی نمایش بده و اینکه حتما اعداد را داخل [] بگذار",
-    "title" : "یک عنوان به زبان فارسی برای آسیب پذیری با شناسه {{ID}} بهم بده و آن را داخل [] بنویس با توجه به منابع {{REF}} و در آن نام CVEو دستگاه آسیب پذیر را بنویس",
-    "tags" : "چند تا برچسب به انگلیسی برای آسیب پذیری {{ID}} بهم بده در برچسب از نوشتن امتیاز خودداری بکن و فقط برچسب های کلی را بنویس هر هر بچسب را داخل [] بنویس",
+    "title" : "یک عنوان به زبان فارسی برای آسیب پذیری با شناسه {{ID}} بهم بده با توجه به منابع {{REF}} و در آن فقط و فقط و فقط نام CVEو دستگاه آسیب پذیر را بنویس و حتما آن را داخل [] قرار بده",
+    "info" : "یک توضیح کامل در مورد آسیب پذیری با شناسه {{ID}} با منابع {{REF}} به زبان فارسی بهم بده و هیچ توضیحی در خصوص راهکار امن سازی نده و در متنی که بهم میدی هم سوال از من نپرس",
+    "remedition" : "یک راهکار امن سازی برای آسیب پذیری با شناسه {{ID}} بهم بده با توجه به منابع {{REF}} و اگر در ورژن های بعدی آسیب پذیری رفع شده بود ورژن امن را در آخر بهم بگو و در متن هم از من سوال نپرس",
 }
 
 def getcve_details(cve):
@@ -182,16 +188,6 @@ def getcve_details(cve):
         "References" : urls,
         "publishedDate" : data['publishedDate']
     }
-
-
-
-def markup_to_text(markup_text):
-    html = markdown(markup_text)
-    soup = BeautifulSoup(html, features="lxml")
-    text = ''.join(soup.find_all(string=True))
-
-    return text
-
 
 def RAG(message=''):
     time.sleep(5)
@@ -207,7 +203,7 @@ def RAG(message=''):
                 "Accept-Language": "en-US,en;q=0.9,fa;q=0.8",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
                 "Cache-Control": "no-cache",
-                'Authorization': 'Bearer kk-_GKPb-ZGktf3iSggO4U1oKH3UND5_Pajelhcp4yRM0E',
+                'Authorization': f'Bearer {khoj_token}',
                 "sec-gpc": "1",
             }
 
@@ -266,7 +262,7 @@ if cvename :
 
 url = "https://api.vulncheck.com/v3/index/nist-nvd2"
 headers = {
-    "cookie": "token=vulncheck_6973d6a0a88165b652e578ec9b415dc1de2048af6da4ae48f442a5885cca77a0"
+    "cookie": f"token={vulncheck}"
 }
 
 response = requests.get(url, headers=headers)
