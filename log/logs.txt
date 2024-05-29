@@ -1,8 +1,1 @@
-Error on attempt 3 for CVE CVE-2022-30190: 'NoneType' object has no attribute 'group'
-Error on attempt 3 for CVE CVE-2022-30190: 'NoneType' object has no attribute 'group'
-Error on attempt Slow down! Too Many RequestsError on attempt Slow down! Too Many RequestsError on attempt 3 for CVE CVE-2022-30190: string indices must be integers, not 'str'
-Error on attempt 3 for CVE CVE-2022-30190: string indices must be integers, not 'str'
-Error on attempt 3 for CVE CVE-2022-30190: 'str' object has no attribute 'get'
-Error on attempt 3 for CVE CVE-2022-30190: Too Many Requests: Please slow down.
-2024-05-28 10:01:52 - Error on attempt 3 for CVE CVE-2022-30190: Too Many Requests: Please slow down.
-2024-05-28 10:07:28 - Error on attempt 3 for CVE CVE-2022-30190: Too Many Requests: Please slow down.
+
