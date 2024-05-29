@@ -9,12 +9,14 @@ import re
 import json
 import argparse
 
-parser = argparse.ArgumentParser(description='دریافت cvename از خط فرمان')
-parser.add_argument('--cvename', type=str, default='', help='نام CVE (اگر وجود دارد)')
+# parser = argparse.ArgumentParser(description='دریافت cvename از خط فرمان')
+# parser.add_argument('--cvename', type=str, default='', help='نام CVE (اگر وجود دارد)')
 
-args = parser.parse_args()
+# args = parser.parse_args()
 
-cvename = args.cvename
+# cvename = args.cvename
+
+cvename = "CVE-2019-9512"
 
 matched_cves = {}
 
