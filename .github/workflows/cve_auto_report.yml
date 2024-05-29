@@ -34,6 +34,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
           KHOJ_TOKEN: ${{ secrets.KHOJ_TOKEN }}
+          VULNCHECK_TOKEN: ${{ secrets.VULNCHECK_TOKEN }}
 
       - name: Create local changes
         run: git add "cve_files/" "log/"
