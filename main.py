@@ -34,14 +34,9 @@ def send_cve_message_to_telegram(cve_data):
         message += f"<b>Info:</b> {cve_data['info']}<br>"
         message += f"<b>Tags:</b> {', '.join(cve_data['tags'])}<br>"
 
-        # Telegram configuration
-        # telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-        # telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
-        # telegram_thread_id = os.getenv('TELEGRAM_THREAD_ID')
-
-        telegram_bot_token = "6657742129:AAErw-H-hewoR5KHUjuGS769Ovae3vgpJIY"
-        telegram_chat_id = -1002029707582
-        telegram_thread_id = 18514
+        telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+        telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
+        telegram_thread_id = os.getenv('TELEGRAM_THREAD_ID')
 
         if not telegram_bot_token:
             raise ValueError("TELEGRAM_BOT_TOKEN wasn't configured in the secrets!")
@@ -95,7 +90,7 @@ def convert_json(all_cve):
         'source': "زفتا",
         'title': cve_data["title"],
         'link': "https://nvd.nist.gov/vuln/detail/" + cve_data["CVE"],
-        'summary': f"{text[:200]} ... ",
+        'summary': f"{text[:200]} ...",
         'info': f"{cve_data['info']}<br> <h2>راهکار امن سازی :</h2><br> {cve_data['remedition']}" ,
         'publish_date': convert_datetime_format(cve_data['publishedDate']),
         'chart': cve_data['chart'],
