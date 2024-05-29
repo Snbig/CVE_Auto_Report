@@ -33,9 +33,10 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
+          KHOJ_TOKEN: ${{ secrets.KHOJ_TOKEN }}
 
       - name: Create local changes
-        run: git add cve_files/*
+        run: git add cve_files/* log/*
 
       - name: Commit results to Github
         run: |
