@@ -149,7 +149,9 @@ def create_cve_details(cve):
                     print(f"create tags for {cve['CVE']}")
                 elif key == 'chart':
                     res = remove_compiled_section(res)
+                    print(res)
                     numbers = re.findall(r'\[(.*?)\]', res)
+                    print(numbers)
                     chart = [int(num.replace("\\","")) for group in numbers for num in group.split(', ')]
                     ai_dic[key] = chart
                     print(f"create chart for {cve['CVE']}")
