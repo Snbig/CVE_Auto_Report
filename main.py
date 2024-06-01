@@ -29,12 +29,12 @@ def send_cve_message_to_telegram(cve_data):
     try:
         # Generate message from JSON data
         message = f"🟢 [{cve_data['id']}]({cve_data['link']})  \n\n"
-        message = f"🚨 *عنوان*: {cve_data['title']}  \n\n"
-        message += f"📣 *منابع*: {cve_data['source']} \n\n "
-        message += f"📓 *خلاصه*: {cve_data['summary']} \n\n  "
-        message += f"📅 *تاریخ انتشار*: {cve_data['publish_date']}  \n\n  "
-        message += f"😈 *شرح آسیب پذیری*: {cve_data['info']} \n\n "
-        message += f"🏷️ *برچسب*: {', '.join(cve_data['tags'])} \n\n "
+        message = f"🚨 **عنوان**: {cve_data['title']}  \n\n"
+        message += f"📣 **منابع**: {cve_data['source']} \n\n "
+        message += f"📓 **خلاصه**: {cve_data['summary']} \n\n  "
+        message += f"📅 **تاریخ انتشار**: {cve_data['publish_date']}  \n\n  "
+        message += f"😈 **شرح آسیب پذیری**: {cve_data['info']} \n\n "
+        message += f"🏷️ **برچسب**: {', '.join(cve_data['tags'])} \n\n "
         message += f"🏷️ *چارت*: {', '.join(cve_data['chart'])} \n\n "
 
         telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -281,11 +281,12 @@ if response.status_code == 200:
     new_last_checked_time = datetime.now() 
     
     news_cve = {}
+    keyword_check = False
     for cve in cve_list:
         published_time = parse_cve_time(cve['published'])
         if published_time > last_checked_time:
             description = cve['descriptions'][0]['value'].lower()
-            if any(keyword in description for keyword in keywords):
+            if any(keyword in description for keyword in keywords) or not keyword_check:
                 references = [ref['url'] for ref in cve.get('references', [])]
                 
                 cve_data = {
