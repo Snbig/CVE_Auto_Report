@@ -151,8 +151,11 @@ def create_cve_details(cve):
                     res = remove_compiled_section(res)
                     print(res)
                     matches = re.search(r'\\?\[(\d+(?:,\s*\d+)*)\\?\]', res)
-                    numbers = matches.group(1)
-                    chart = [i.strip() for i in numbers.split(',')]
+                    try:
+                        numbers = matches.group(1)
+                        chart = [i.strip() for i in numbers.split(',')]
+                    except:
+                        chart = [0]
                     ai_dic[key] = chart
                     print(f"create chart for {cve['CVE']}")
                 else: 
