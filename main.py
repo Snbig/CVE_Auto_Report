@@ -96,7 +96,7 @@ def convert_json(all_cve):
         'link': "https://nvd.nist.gov/vuln/detail/" + cve_data["CVE"],
         'summary': f"{text[:200]} ... ",
         'info': f"{cve_data['info']}\n\n   راهکار امن سازی :   {cve_data['remedition']}" ,
-        'publish_date': convert_datetime_format(cve_data['publishedDate']),
+        'publish_date': convert_datetime_format(cve_data['Published']),
         'chart': cve_data['chart'],
         }
 
@@ -150,9 +150,9 @@ def create_cve_details(cve):
                 elif key == 'chart':
                     res = remove_compiled_section(res)
                     print(res)
-                    numbers = re.findall(r'\[(.*?)\]', res)
-                    print(numbers)
-                    chart = [int(num.replace("\\","")) for group in numbers for num in group.split(', ')]
+                    matches = re.search(r'\\?\[(\d+(?:,\s*\d+)*)\\?\]', res)
+                    numbers = matches.group(1)
+                    chart = [i.strip() for i in numbers.split(',')]
                     ai_dic[key] = chart
                     print(f"create chart for {cve['CVE']}")
                 else: 
