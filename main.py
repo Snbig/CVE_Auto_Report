@@ -100,14 +100,14 @@ def convert_json(all_cve):
         'chart': cve_data['chart'],
         }
 
-        print(f"file {cve_data["CVE"]} created")
+        print(f'file {cve_data["CVE"]} created')
 
         # Dump the data to JSON with proper indentation and encoding
         json_data = json.dumps(data, ensure_ascii=False, indent=4)
         with open(file_name, 'w', encoding='utf-8') as file:
             file.write(json_data)
 
-        print(f"sending {cve_data["CVE"]} to telegram ...")
+        print(f'sending {cve_data["CVE"]} to telegram ...')
 
         send_cve_message_to_telegram(data)
 
