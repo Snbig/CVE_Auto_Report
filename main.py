@@ -289,18 +289,19 @@ if response.status_code == 200:
         published_time = parse_cve_time(cve['published'])
         if published_time > last_checked_time:
             description = cve['descriptions'][0]['value'].lower()
-            if any(keyword in description for keyword in keywords) or not keyword_check:
-                references = [ref['url'] for ref in cve.get('references', [])]
+            if "rejected reason" not in description:
+                if any(keyword in description for keyword in keywords) or not keyword_check:
+                    references = [ref['url'] for ref in cve.get('references', [])]
                 
-                cve_data = {
-                    "CVE": cve['id'],
-                    "Published": cve['published'],
-                    "Description": cve['descriptions'][0]['value'],
-                    "References": references
-                }
+                    cve_data = {
+                        "CVE": cve['id'],
+                        "Published": cve['published'],
+                        "Description": cve['descriptions'][0]['value'],
+                        "References": references
+                    }
 
                 
-                news_cve[cve['id']] = cve_data
+                    news_cve[cve['id']] = cve_data
 
     if news_cve:
         print(news_cve)
