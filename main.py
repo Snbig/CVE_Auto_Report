@@ -29,7 +29,7 @@ khoj_wss_token = os.getenv('KHOJ_WSS_TOKEN')
 vulncheck = os.getenv('VULNCHECK_TOKEN')
 
 def RAG(prompt):
-
+    print(prompt)
     headers = {
         "Pragma": "no-cache",
         "dnt": "1",
