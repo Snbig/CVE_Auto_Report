@@ -86,7 +86,7 @@ def RAG(prompt):
     }
 
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("wss://app.khoj.dev/api/chat/ws?conversation_id={conversation_id}",
+    ws = websocket.WebSocketApp(f"wss://app.khoj.dev/api/chat/ws?conversation_id={conversation_id}",
                                 on_open=on_open,
                                 on_message=on_message,
                                 on_error=on_error,
