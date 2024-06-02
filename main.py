@@ -229,6 +229,8 @@ def RAG(message=''):
                 headers=headers,
             )
 
+            print(response.txt)
+
 
             response_del = requests.delete('https://app.khoj.dev/api/chat/history?client=web&conversation_id=' + str(conversation_id), headers=headers)
             if response_del.status_code == 200:
