@@ -374,12 +374,12 @@ if response.status_code == 200:
             if "rejected reason" not in description:
                 if any(keyword in description for keyword in keywords) or not keyword_check:
                     references = [ref['url'] for ref in cve.get('references', [])]
-                
+                    cvss = cve['metrics']['cvssMetricV31'][0]
                     cve_data = {
                         "CVE": cve['id'],
-                        "CVSS_vector": cve['metrics']['cvssData'].get('vectorString',''),
-                        "CVSS_score": cve['metrics']['cvssData'].get('baseScore',''),
-                        "CVSS_severity": cve['metrics']['cvssData'].get('baseSeverity',''),
+                        "CVSS_vector": cvss['cvssData'].get('vectorString',''),
+                        "CVSS_score": cvss['cvssData'].get('baseScore',''),
+                        "CVSS_severity": cvss['cvssData'].get('baseSeverity',''),
                         "Published": cve['published'],
                         "Description": cve['descriptions'][0]['value'],
                         "References": references
