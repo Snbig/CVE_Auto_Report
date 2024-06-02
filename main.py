@@ -25,6 +25,7 @@ all_cve = {}
 
 
 khoj_token = os.getenv('KHOJ_TOKEN')
+khoj_wss_token = os.getenv('KHOJ_WSS_TOKEN')
 vulncheck = os.getenv('VULNCHECK_TOKEN')
 
 def RAG(prompt):
