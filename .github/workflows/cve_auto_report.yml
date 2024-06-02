@@ -2,7 +2,7 @@ name: cve_auto_report_action
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/59 * * * *'
   workflow_dispatch:
   pull_request:
     branches: [ "main" ]
