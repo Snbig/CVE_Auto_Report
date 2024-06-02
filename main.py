@@ -8,6 +8,8 @@ import re
 import json
 import argparse
 from html.parser import HTMLParser
+import websocket
+import rel
 
 
 parser = argparse.ArgumentParser(description='دریافت cvename از خط فرمان')
@@ -24,6 +26,78 @@ all_cve = {}
 
 khoj_token = os.getenv('KHOJ_TOKEN')
 vulncheck = os.getenv('VULNCHECK_TOKEN')
+
+def RAG(prompt):
+
+    headers = {
+        "Pragma": "no-cache",
+        "dnt": "1",
+        "Accept-Language": "en-US,en;q=0.9,fa;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Cache-Control": "no-cache",
+        'Authorization': f'Bearer {khoj_token}',
+        #'cookie': f"session={khoj_token}",
+        "sec-gpc": "1",
+    }
+
+    params = {
+        'client': 'web',
+        'agent_slug': 'khoj',
+    }
+
+    response1 = requests.post('https://app.khoj.dev/api/chat/sessions', params=params, headers=headers)
+    conversation_id = ''
+    if response1.status_code == 200:
+        conversation_id = response1.json()['conversation_id']
+        print(f"your conversation_id is : {conversation_id}")
+
+    resp_message = []
+
+    def on_message(ws, message):
+        nonlocal resp_message
+        if 'end_llm_response' in message:
+            ws.close()
+            rel.abort()
+        if 'start_llm_response' in message or 'start_llm_response' in resp_message:
+            resp_message.append(message)
+
+    def on_error(ws, error):
+        print(error)
+
+    def on_close(ws, close_status_code, close_msg):
+        print("### closed ###")
+
+    def on_open(ws):
+        print("Opened connection")
+        ws.send(prompt)
+
+    headers = {
+        'Pragma': 'no-cache',
+        'dnt': '1',
+        'Accept-Language': 'en-US,en;q=0.9,fa;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+        'Upgrade': 'websocket',
+        'Cache-Control': 'no-cache',
+        'sec-gpc': '1',
+        'Cookie': f'{khoj_wss_token}',
+        'Connection': 'Upgrade',
+        'Sec-WebSocket-Version': '13',
+    }
+
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("wss://app.khoj.dev/api/chat/ws?conversation_id={conversation_id}",
+                                on_open=on_open,
+                                on_message=on_message,
+                                on_error=on_error,
+                                on_close=on_close,
+                                header=headers)
+
+    ws.run_forever(dispatcher=rel, reconnect=5)  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly
+    rel.signal(2, rel.abort)  # Keyboard Interrupt
+    rel.dispatch()
+
+    return ''.join(resp_message)
+
 
 def send_cve_message_to_telegram(cve_data):
     try:
@@ -193,7 +267,7 @@ def getcve_details(cve):
         "References" : urls,
         "publishedDate" : data['publishedDate']
     }
-
+'''
 def RAG(message=''):
     time.sleep(5)
     attempt = 0
@@ -247,7 +321,7 @@ def RAG(message=''):
                     log_file.write(f"Error on attempt {attempt}: {e}\n")
                 raise 
 
-
+'''
 def read_last_checked_time():
     try:
         with open('./config/time.txt', 'r', encoding='utf-8') as file:
