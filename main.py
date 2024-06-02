@@ -208,8 +208,8 @@ def RAG(message=''):
                 "Accept-Language": "en-US,en;q=0.9,fa;q=0.8",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
                 "Cache-Control": "no-cache",
-                'Authorization': f'Bearer {khoj_token}',
-                #'cookie': "session=eyJ1c2VyIjogeyJpc3MiOiAiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tIiwgImF6cCI6ICI1NzY4NjE0NTk3ODgtMWF0cmZpZjhwM3Mxa2h0bDhwZGs2azNrOXI2MzA5cWYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCAiYXVkIjogIjU3Njg2MTQ1OTc4OC0xYXRyZmlmOHAzczFraHRsOHBkazZrM2s5cjYzMDlxZi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsICJzdWIiOiAiMTE1NDMyMTc4NTczMDQ2MDQ5MzAzIiwgImVtYWlsIjogImZvcmRqaW02MTNAZ21haWwuY29tIiwgImVtYWlsX3ZlcmlmaWVkIjogdHJ1ZSwgIm5iZiI6IDE3MTcwNDcyMTUsICJuYW1lIjogIkppbSBGb3JkIiwgInBpY3R1cmUiOiAiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSUx1Z1ZQT0djT3pMVUU4YWgxeUdoNHUwZ0VERmtYcFhUcHRIaUFjTmYtN3RQMWV3PXM5Ni1jIiwgImdpdmVuX25hbWUiOiAiSmltIiwgImZhbWlseV9uYW1lIjogIkZvcmQiLCAiaWF0IjogMTcxNzA0NzUxNSwgImV4cCI6IDE3MTcwNTExMTUsICJqdGkiOiAiY2NkZjkwZDViMWM2OTA0YmRmZDYzZTI2MTFmZGRjN2M3M2NlZGZkZSJ9fQ==.ZlgQ_Q.cTydN4dFtwnReslajUdkAs6y1Sc",
+                #'Authorization': f'Bearer {khoj_token}',
+                'cookie': f"session={khoj_token}",
                 "sec-gpc": "1",
             }
 
