@@ -229,7 +229,7 @@ def RAG(message=''):
                 headers=headers,
             )
 
-            print(response.txt)
+            print(response.text)
 
 
             response_del = requests.delete('https://app.khoj.dev/api/chat/history?client=web&conversation_id=' + str(conversation_id), headers=headers)
