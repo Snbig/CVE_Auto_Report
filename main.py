@@ -56,6 +56,7 @@ def RAG(prompt):
 
     def on_message(ws, message):
         nonlocal resp_message
+        nonlocal conversation_id
         if 'end_llm_response' in message:
             response_del = requests.delete('https://app.khoj.dev/api/chat/history?client=web&conversation_id=' + str(conversation_id), headers=headers)
             if response_del.status_code == 200:
@@ -96,7 +97,7 @@ def RAG(prompt):
                                 on_close=on_close,
                                 header=headers)
 
-    ws.run_forever(dispatcher=rel, reconnect=5)  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly
+    ws.run_forever(dispatcher=rel, reconnect=5, ping_timeout=60)  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly
     rel.signal(2, rel.abort)  # Keyboard Interrupt
     rel.dispatch()
 
@@ -104,6 +105,7 @@ def RAG(prompt):
 
 
 def send_cve_message_to_telegram(cve_data):
+    print(cve_data)
     try:
         # Generate message from JSON data
         message = f"🟢 [{cve_data['id']}]({cve_data['link']})  \n\n  "
