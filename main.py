@@ -377,9 +377,9 @@ if response.status_code == 200:
                 
                     cve_data = {
                         "CVE": cve['id'],
-                        "CVSS_vector": cve['cvssData'].get('vectorString',''),
-                        "CVSS_score": cve['cvssData'].get('baseScore',''),
-                        "CVSS_severity": cve['cvssData'].get('baseSeverity',''),
+                        "CVSS_vector": cve['metrics']['cvssData'].get('vectorString',''),
+                        "CVSS_score": cve['metrics']['cvssData'].get('baseScore',''),
+                        "CVSS_severity": cve['metrics']['cvssData'].get('baseSeverity',''),
                         "Published": cve['published'],
                         "Description": cve['descriptions'][0]['value'],
                         "References": references
