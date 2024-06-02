@@ -106,8 +106,10 @@ def RAG(prompt):
 def send_cve_message_to_telegram(cve_data):
     try:
         # Generate message from JSON data
-        message = f"🟢 [{cve_data['id']}]({cve_data['link']})  \n\n"
-        message = f"🚨 *عنوان* : {cve_data['title']}  \n\n"
+        message = f"🟢 [{cve_data['id']}]({cve_data['link']})  \n\n  "
+        message += f"🚨 *عنوان* : {cve_data['title']}  \n\n"
+        message += f"*شدت* : #{cve_data['CVSS_severity']} ({cve_data['CVSS_score']})  \n\n  "
+        message += f"*بردار حمله* : {cve_data['CVSS_vector']}  \n\n  "
         # message += f"📣 *منابع* : {cve_data['source']} \n\n "
         # message += f"📓 *خلاصه* : {cve_data['summary']} \n\n  "
         message += f"📅 *تاریخ انتشار* : {cve_data['publish_date']}  \n\n  "
@@ -375,6 +377,9 @@ if response.status_code == 200:
                 
                     cve_data = {
                         "CVE": cve['id'],
+                        "CVSS_vector": cve['cvssData'].get('vectorString',''),
+                        "CVSS_score": cve['cvssData'].get('baseScore',''),
+                        "CVSS_severity": cve['cvssData'].get('baseSeverity',''),
                         "Published": cve['published'],
                         "Description": cve['descriptions'][0]['value'],
                         "References": references
