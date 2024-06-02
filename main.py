@@ -57,6 +57,9 @@ def RAG(prompt):
     def on_message(ws, message):
         nonlocal resp_message
         if 'end_llm_response' in message:
+            response_del = requests.delete('https://app.khoj.dev/api/chat/history?client=web&conversation_id=' + str(conversation_id), headers=headers)
+            if response_del.status_code == 200:
+                print(f"Conversation {conversation_id} history cleared")
             ws.close()
             rel.abort()
         if 'start_llm_response' in message or 'start_llm_response' in resp_message:
