@@ -1,4 +1,4 @@
 Markdown==3.6
 requests==2.32.2
-websocket
+websocket-client
 rel
