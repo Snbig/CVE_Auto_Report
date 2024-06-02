@@ -97,7 +97,7 @@ def RAG(prompt):
     rel.signal(2, rel.abort)  # Keyboard Interrupt
     rel.dispatch()
 
-    return ''.join(resp_message)
+    return ''.join(resp_message[1:])
 
 
 def send_cve_message_to_telegram(cve_data):
