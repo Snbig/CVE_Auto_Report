@@ -62,7 +62,6 @@ def RAG(prompt):
             if response_del.status_code == 200:
                 print(f"Conversation {conversation_id} history cleared")
             ws.close()
-            rel.abort()
         if 'start_llm_response' in message or 'start_llm_response' in resp_message:
             resp_message.append(message)
 
@@ -71,6 +70,7 @@ def RAG(prompt):
 
     def on_close(ws, close_status_code, close_msg):
         print("### closed ###")
+        rel.abort()
 
     def on_open(ws):
         print("Opened connection")
